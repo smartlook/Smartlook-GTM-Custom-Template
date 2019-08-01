@@ -1,2 +1,2 @@
-# Smartlook-GTM-Custom-Template
+# Smartlook Custom Template
 Smartlook's GTM Custom Template 
