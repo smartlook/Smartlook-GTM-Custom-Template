@@ -1,0 +1,5 @@
+homepage: "https://www.smartlook.com",
+documentation: "https://www.smartlook.com/help/",
+versions:
+  - sha: 123abc
+    changeNotes: Initial Version

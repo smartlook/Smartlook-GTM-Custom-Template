@@ -2,7 +2,7 @@
 
 {
   "displayName": "Smartlook",
-  "description": "Smartlook is a qualitative analytics solution for websites and mobile apps with always-on visitor recordings, automatic event tracking, conversion funnels and heatmaps.",
+  "description": "Smartlook is a qualitative analytics solution for websites and mobile apps with always-on visitor recordings, automatic event tracking, conversion funnels and heatmaps. More info at www.smartlook.com.",
   "securityGroups": [],
   "id": "cvt_temp_public_id",
   "type": "TAG",
@@ -22,10 +22,11 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "displayName": "Smartlook Project Key",
+    "displayName": "Add your unique Smartlook project key in field below. This is retrieved upon creation of a Smartlook project.",
     "simpleValueType": true,
     "name": "SmartlookProjectKey",
-    "type": "TEXT"
+    "type": "TEXT",
+    "help": "Check out Smartlook knowledge base for additional help & guidance: https://www.smartlook.com/help/onboarding/"
   }
 ]
 
@@ -178,4 +179,4 @@ injectScript(url, data.gtmOnSuccess, data.gtmOnFailure, 'SmartlookInit');
 
 ___NOTES___
 
-Created on 8/1/2019, 10:44:36 AM
+Created on 9/16/2019, 10:43:00 AM
