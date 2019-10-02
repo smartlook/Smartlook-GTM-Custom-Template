@@ -45,7 +45,7 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "displayName": "Add your unique Smartlook project key in field below. This is retrieved upon creation of a Smartlook project.",
+    "displayName": "Add your unique Smartlook project key in field below. The key is retrieved upon creation of a Smartlook project.",
     "simpleValueType": true,
     "name": "SmartlookProjectKey",
     "type": "TEXT",
