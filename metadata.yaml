@@ -1,5 +1,5 @@
 homepage: "https://www.smartlook.com",
 documentation: "https://www.smartlook.com/help/",
 versions:
-  - sha: 7b7ec8d1df02fee4f8021e8c7be208e9c94150cd
+  - sha: 0bef4dd7125bdfaa8ebd4ef20e97d5a42068a6db
     changeNotes: Initial Version
