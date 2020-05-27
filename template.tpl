@@ -190,16 +190,69 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 const createArgumentsQueue = require('createArgumentsQueue');
 const injectScript = require('injectScript');
+const createQueue = require('createQueue');
+const dataLayerPush = createQueue('dataLayer');
 const SLProjectKey = data.SmartlookProjectKey;
 
 const smartlook = createArgumentsQueue('smartlook', 'smartlook.api');
 
 smartlook('init', SLProjectKey);
 
+function smartlookLoaded() {
+  dataLayerPush({ event: 'smartlookLoaded' });
+  data.gtmOnSuccess();
+}
+
 const url = 'https://rec.smartlook.com/recorder.js';
-injectScript(url, data.gtmOnSuccess, data.gtmOnFailure, 'SmartlookInit');
+injectScript(url, smartlookLoaded, data.gtmOnFailure, 'SmartlookInit');
+
+
+
+___TESTS___
+
+scenarios:
+- name: Trigger
+  code: |-
+    const mockData = {
+      SmartlookProjectKey: '12345'
+    };
+
+    runCode(mockData);
+
+    assertApi('injectScript').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+setup: |-
+  mock('createArgumentsQueue', function(name, namespace) {
+    assertThat(name).isEqualTo('smartlook');
+    assertThat(namespace).isEqualTo('smartlook.api');
+    return function(eventName, key) {
+      assertThat(eventName).isEqualTo('init');
+      assertThat(key).isEqualTo('12345');
+    };
+  });
+
+  mock('injectScript', function(url, onSuccess, onFailure) {
+    assertThat(url).isEqualTo('https://rec.smartlook.com/recorder.js');
+    onSuccess();
+  });
+
+  mock('createQueue', function(name) {
+    assertThat(name).isEqualTo('dataLayer');
+    return function(item) {
+      assertThat(item.event).isEqualTo('smartlookLoaded');
+    };
+  });
 
 
 ___NOTES___
 
-Created on 9/16/2019, 10:43:00 AM
+(1) This template loads the Smartlook SDK.
+(2) Upon success - it calls on init with project key.
+(3) Finally - it fires a custom event, `smartlookLoaded` to be picked up by other tags in your system.
+
+For example, my custom tag configures a Smartlook dimention
+```
+<script>
+smartlook('identify', {{User Id}});
+</script>
+```
