@@ -1,4 +1,4 @@
-// Copyright 2019 Smartsupp.com, s.r.o
+// Copyright 2020 Smartsupp.com, s.r.o
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@ By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
 https://developers.google.com/tag-manager/gallery-tos (or such other URL as
 Google may provide), as modified from time to time.
- 
+
 ___INFO___
 
 {
   "displayName": "Smartlook",
   "description": "Smartlook is a qualitative analytics solution for websites and mobile apps with always-on visitor recordings, automatic event tracking, conversion funnels and heatmaps. More info at www.smartlook.com.",
-  "categories": ["ANALYTICS", "SESSION_RECORDING", "HEAT_MAP"],
+  "categories": [
+    "ANALYTICS",
+    "SESSION_RECORDING",
+    "HEAT_MAP"
+  ],
   "securityGroups": [],
   "id": "cvt_temp_public_id",
   "type": "TAG",
@@ -49,9 +53,35 @@ ___TEMPLATE_PARAMETERS___
     "simpleValueType": true,
     "name": "SmartlookProjectKey",
     "type": "TEXT",
-    "help": "Check out Smartlook knowledge base for additional help & guidance: https://www.smartlook.com/help/onboarding/"
+    "help": "Check out Smartlook knowledge base for additional help and guidance: https://www.smartlook.com/help/onboarding/"
   }
 ]
+
+
+___SANDBOXED_JS_FOR_WEB_TEMPLATE___
+
+const createArgumentsQueue = require('createArgumentsQueue');
+const injectScript = require('injectScript');
+const createQueue = require('createQueue');
+const dataLayerPush = createQueue('dataLayer');
+const SLProjectKey = data.SmartlookProjectKey;
+const queryPermission = require('queryPermission');
+
+const smartlookScriptLoaded = () => {
+  if (queryPermission('access_globals', 'readwrite', 'dataLayer')) {
+    dataLayerPush({ event: 'smartlookLoaded' });
+  }
+  data.gtmOnSuccess();
+};
+
+const smartlook = createArgumentsQueue('smartlook', 'smartlook.api');
+
+smartlook('init', SLProjectKey);
+
+const url = 'https://rec.smartlook.com/recorder.js';
+if (queryPermission('inject_script', url)) {
+  injectScript(url, smartlookScriptLoaded, data.gtmOnFailure, 'SmartlookInit');
+}
 
 
 ___WEB_PERMISSIONS___
@@ -146,6 +176,45 @@ ___WEB_PERMISSIONS___
                     "boolean": true
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "dataLayer"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
               }
             ]
           }
@@ -186,20 +255,44 @@ ___WEB_PERMISSIONS___
 ]
 
 
-___SANDBOXED_JS_FOR_WEB_TEMPLATE___
+___TESTS___
 
-const createArgumentsQueue = require('createArgumentsQueue');
-const injectScript = require('injectScript');
-const SLProjectKey = data.SmartlookProjectKey;
+scenarios:
+- name: Trigger
+  code: |-
+    const mockData = {
+      SmartlookProjectKey: '12345'
+    };
 
-const smartlook = createArgumentsQueue('smartlook', 'smartlook.api');
+    runCode(mockData);
 
-smartlook('init', SLProjectKey);
+    assertApi('injectScript').wasCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+setup: |-
+  mock('createArgumentsQueue', function(name, namespace) {
+    assertThat(name).isEqualTo('smartlook');
+    assertThat(namespace).isEqualTo('smartlook.api');
+    return function(eventName, key) {
+      assertThat(eventName).isEqualTo('init');
+      assertThat(key).isEqualTo('12345');
+    };
+  });
 
-const url = 'https://rec.smartlook.com/recorder.js';
-injectScript(url, data.gtmOnSuccess, data.gtmOnFailure, 'SmartlookInit');
+  mock('injectScript', function(url, onSuccess, onFailure) {
+    assertThat(url).isEqualTo('https://rec.smartlook.com/recorder.js');
+    onSuccess();
+  });
+
+  mock('createQueue', function(name) {
+    assertThat(name).isEqualTo('dataLayer');
+    return function(item) {
+      assertThat(item.event).isEqualTo('smartlookLoaded');
+    };
+  });
 
 
 ___NOTES___
 
-Created on 9/16/2019, 10:43:00 AM
+(1) This template loads the Smartlook SDK.
+(2) Upon success - it calls on init with project key.
+(3) Finally - it fires a custom event, `smartlookLoaded` to be picked up by other tags in your system.
