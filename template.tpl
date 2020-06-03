@@ -296,10 +296,3 @@ ___NOTES___
 (1) This template loads the Smartlook SDK.
 (2) Upon success - it calls on init with project key.
 (3) Finally - it fires a custom event, `smartlookLoaded` to be picked up by other tags in your system.
-
-For example, my custom tag configures a Smartlook dimention
-```
-<script>
-smartlook('identify', {{User Id}});
-</script>
-```
