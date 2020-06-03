@@ -1,6 +1,6 @@
 # Smartlook GTM Custom Template
 
-Google Tag Manager Custom Template for Smartlook projects. 
+Google Tag Manager Custom Template for Smartlook projects.
 
 Smartlook is a qualitative analytics solution for websites and mobile apps helping over 200,000 businesses of all sizes and industries answer the "whys" behind their users' actions. Eliminate the guesswork and discover real, actionable reasons.
 
