@@ -2,8 +2,10 @@ homepage: "https://www.smartlook.com",
 documentation: "https://www.smartlook.com/help/",
 versions:
   # Latest version
+  - sha: f423fc2080f2972a828ad3fe487eba51423f530f
+    changeNotes: Use new web-sdk, add data region select
+  # Older versions
   - sha: 051f07417b1c44b3b87fa4f2204638c77437a5ba
     changeNotes: Add 'smartlookLoaded' event, add tests
-  # Older versions
   - sha: cd18410f2bb2c79178470c3ca887be58781ed1d1
     changeNotes: Initial Version
