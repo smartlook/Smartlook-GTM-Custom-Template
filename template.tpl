@@ -1,4 +1,4 @@
-// Copyright 2020 Smartsupp.com, s.r.o
+// Copyright 2022 Smartlook.com, s.r.o.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,11 +49,35 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "displayName": "Add your unique Smartlook project key in field below. The key is retrieved upon creation of a Smartlook project.",
+    "displayName": "Add your unique Smartlook project key. The key is retrieved upon creation of a Smartlook project.",
     "simpleValueType": true,
     "name": "SmartlookProjectKey",
     "type": "TEXT",
-    "help": "Check out Smartlook knowledge base for additional help and guidance: https://www.smartlook.com/help/onboarding/"
+    "help": "Check out Smartlook knowledge base for additional help and guidance: https://www.smartlook.com/help/onboarding/",
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      }
+    ],
+    "notSetText": "Missing project key"
+  },
+  {
+    "type": "SELECT",
+    "name": "SmartlookRegion",
+    "displayName": "Smartlook data region (advanced)",
+    "selectItems": [
+      {
+        "value": "eu",
+        "displayValue": "Europe"
+      },
+      {
+        "value": "us",
+        "displayValue": "United States"
+      }
+    ],
+    "simpleValueType": true,
+    "defaultValue": "eu",
+    "help": "Change only if your sales representative gave you different data region to use"
   }
 ]
 
@@ -65,6 +89,7 @@ const injectScript = require('injectScript');
 const createQueue = require('createQueue');
 const dataLayerPush = createQueue('dataLayer');
 const SLProjectKey = data.SmartlookProjectKey;
+const SLRegion = data.SmartlookRegion;
 const queryPermission = require('queryPermission');
 
 const smartlookScriptLoaded = () => {
@@ -76,9 +101,9 @@ const smartlookScriptLoaded = () => {
 
 const smartlook = createArgumentsQueue('smartlook', 'smartlook.api');
 
-smartlook('init', SLProjectKey);
+smartlook('init', SLProjectKey, { region: SLRegion });
 
-const url = 'https://rec.smartlook.com/recorder.js';
+const url = 'https://web-sdk.smartlook.com/recorder.js';
 if (queryPermission('inject_script', url)) {
   injectScript(url, smartlookScriptLoaded, data.gtmOnFailure, 'SmartlookInit');
 }
@@ -240,7 +265,7 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "https://rec.smartlook.com/recorder.js"
+                "string": "https://web-sdk.smartlook.com/recorder.js"
               }
             ]
           }
@@ -261,7 +286,8 @@ scenarios:
 - name: Trigger
   code: |-
     const mockData = {
-      SmartlookProjectKey: '12345'
+      SmartlookProjectKey: '12345',
+      SmartlookRegion: 'us',
     };
 
     runCode(mockData);
@@ -272,14 +298,15 @@ setup: |-
   mock('createArgumentsQueue', function(name, namespace) {
     assertThat(name).isEqualTo('smartlook');
     assertThat(namespace).isEqualTo('smartlook.api');
-    return function(eventName, key) {
+    return function(eventName, key, param) {
       assertThat(eventName).isEqualTo('init');
       assertThat(key).isEqualTo('12345');
+      assertThat(param.region).isEqualTo('us');
     };
   });
 
   mock('injectScript', function(url, onSuccess, onFailure) {
-    assertThat(url).isEqualTo('https://rec.smartlook.com/recorder.js');
+    assertThat(url).isEqualTo('https://web-sdk.smartlook.com/recorder.js');
     onSuccess();
   });
 
